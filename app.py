@@ -12,7 +12,7 @@ app.config["SECRET_KEY"] = SECRET_KEY
 app.config["MONGO_URI"] = MONGO_URI
 
 #setup mongodb
-client = pymongo.MongoClient("mongodb+srv://jesslane94:KaRkRyNnxnnUaFih@cluster0.pabasmt.mongodb.net/?retryWrites=true&w=majority")
+client = pymongo.MongoClient(MONGO_URI)
 db = client.db
 
 
