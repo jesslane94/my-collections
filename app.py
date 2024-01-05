@@ -1,9 +1,11 @@
 from flask import Flask, render_template, flash, redirect, request
 from flask_pymongo import PyMongo
 from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 from forms import ItemForm
 from datetime import datetime
 from secure import SECRET_KEY, MONGO_URI
+import certifi
 import pymongo
 import dns
 
@@ -11,9 +13,18 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = SECRET_KEY 
 app.config["MONGO_URI"] = MONGO_URI
 
-#setup mongodb
-client = pymongo.MongoClient(MONGO_URI)
+
+# Set the Stable API version when creating a new client
+# client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
+client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = client.db
+                          
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 
 
 @app.route("/")
