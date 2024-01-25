@@ -1,4 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h3>hello worldddd</h3>
+    <h3>View Collection</h3>
+    <div>
+        {% for item in items %} 
+            <div class ="card-body">
+                <h5 class="card-title">{{ item.name }}</h5>
+                <p class="card-text text-muted">{{ item.date_added }}</p>
+                <p class="card-text">{{ item.description }}</p>
+
+                <a href="{{ url_for('update_item', id = item._id) }}" class="btn btn-info btn-sm">Update</a>
+                <a href="{{ url_for('delete_item', id = item._id) }}" class="btn btn-outline-danger btn-sm">Delete</a>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
