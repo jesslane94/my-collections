@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, request
 from pymongo.mongo_client import MongoClient
-from forms import ItemForm
+from forms import ItemForm, SearchForm
 from datetime import datetime
 from secure import SECRET_KEY, MONGO_URI
 from bson.objectid import ObjectId
@@ -69,8 +69,9 @@ def view_collection():
         item["_id"] = str(item["_id"])
         item["date_added"] = item["date_added"].strftime("%b %d %Y %H:%M:%S")
         items.append(item)
-    """ if len(items) == 0:
-        return render_template("success.html", message = "Currently there are no items in this collection.") """
+    # need to consider better error handling
+    if len(items) == 0:
+        return render_template("error.html", message = "Currently there are no items in this collection.")
     return render_template('view_collection.html', items = items, title = "view collection")
 
 # update
@@ -126,6 +127,46 @@ def update_item(id):
 def delete_item(id): 
     db.item_collection.find_one_and_delete({"_id": ObjectId(id)})
     return render_template("success.html", message = "Successfully deleted item!")
+
+@app.route('/searchItems', methods=['GET'])
+def displaySearchPage():
+    form = SearchForm()
+    return render_template('search.html', form = form)
+
+# search items
+@app.route("/search", methods=["POST","GET"])
+def search():
+    if request.method == 'POST':
+
+        form = SearchForm(request.form)
+        # query here
+        name = form.text.data
+        pipeline = [
+            {
+                "$search": {
+                    "index": "searchName",
+                    "text": {
+                        "query": name,
+                        "path": {
+                            "wildcard": "*"
+                        },
+                        "fuzzy": {}
+                    },
+                },
+            },
+        ]
+        
+        # view items found
+        items = []
+        results = db.item_collection.aggregate(pipeline)
+        for result in results:
+            result["_id"] = str(result["_id"])
+            result["date_added"] = result["date_added"].strftime("%b %d %Y %H:%M:%S")
+            items.append(result)
+        
+        # need to code what happens if nothing is found.
+        
+        return render_template("view_results.html", form = form, items = items, title = "view results")
 
 
 if __name__ == "__main__":

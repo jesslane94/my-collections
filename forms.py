@@ -16,3 +16,6 @@ class ItemForm(FlaskForm):
     # in collection 
     submit = SubmitField("Add Item")
     
+class SearchForm(FlaskForm):
+    text = StringField("Text", validators=[DataRequired()])
+    submit = SubmitField("Search")

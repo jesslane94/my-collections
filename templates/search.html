@@ -1,0 +1,12 @@
+
+{% extends "layout.html" %}
+{% block content %}
+    <h3>Search Collection</h3>
+    <div>
+        <form action="/search" method="POST">
+            {{ form.csrf_token }}
+            {{ form.text }}
+            {{ form.submit(class="btn btn-outline-info") }}
+        </form>
+    </div>
+{% endblock %}
